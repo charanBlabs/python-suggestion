@@ -20,6 +20,7 @@ import pickle
 
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
+from pyngrok import ngrok
 
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -763,7 +764,11 @@ def suggest():
         logging.exception("Error generating suggestions")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/')
+def home():
+    return jsonify({"message": "AI Search Suggestions API is running!"})
 @app.route("/feedback", methods=["POST"])
+
 def feedback():
     auth = require_api_key()
     if auth is False:
@@ -1007,6 +1012,9 @@ def track_event():
 @app.route("/", methods=["GET"])
 def health():
     return jsonify({"status": "ok", "service": "bd-suggest-extended", "model": MODEL_NAME})
+    
+public_url = ngrok.connect(5000)
+print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:5000\"".format(public_url))
 
 if __name__ == "__main__":
     # Initialize database on startup
@@ -1019,4 +1027,5 @@ if __name__ == "__main__":
         nltk.download('wordnet')
     
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="127.0.0.1", port=port, debug=False)
+    #app.run(host="127.0.0.1", port=port, debug=False)
+    app.run(port=5000)
