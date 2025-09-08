@@ -7,3 +7,4 @@ nltk
 spacy
 rank-bm25
 requests
+gunicorn
