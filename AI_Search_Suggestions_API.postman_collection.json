@@ -1,0 +1,716 @@
+{
+	"info": {
+		"_postman_id": "ai-search-suggestions-api",
+		"name": "AI Search Suggestions API",
+		"description": "Complete testing collection for AI Search Suggestions API with self-learning capabilities",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Service is running\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"ok\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Suggestions (Full Data)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					},
+					{
+						"key": "X-AB-Variant",
+						"value": "A"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"current_query\": \"doctor near me\",\n  \"user_id\": \"{{user_id}}\",\n  \"user_search_history\": [\"dentist\", \"plumber\"],\n  \"user_location\": \"{{user_location}}\",\n  \"user_latitude\": {{user_lat}},\n  \"user_longitude\": {{user_lon}},\n  \"debug\": true,\n  \"site_data\": {\n    \"settings\": { \"radius_km\": 25 },\n    \"categories\": [\n      {\n        \"top_category\": \"Healthcare\",\n        \"sub_category\": \"Medical\",\n        \"sub_sub_category\": \"General Practice\"\n      },\n      {\n        \"top_category\": \"Home Services\",\n        \"sub_category\": \"Plumbing\"\n      }\n    ],\n    \"members\": [\n      {\n        \"id\": 101,\n        \"name\": \"Dr. John Smith\",\n        \"tags\": \"family doctor, general practice, pediatrics\",\n        \"location\": \"New York, NY\",\n        \"reviews\": \"Excellent family doctor with 20 years experience\",\n        \"rating\": 4.8,\n        \"profile_url\": \"https://example.com/members/101\",\n        \"thumbnail_url\": \"https://picsum.photos/seed/101/200\",\n        \"latitude\": 40.7128,\n        \"longitude\": -74.0060,\n        \"featured\": true,\n        \"plan_level\": \"premium\",\n        \"priority_score\": 2,\n        \"promo_badge\": \"10% off new patients\",\n        \"hours\": {\n          \"mon\": [[\"09:00\", \"17:00\"]],\n          \"tue\": [[\"09:00\", \"17:00\"]]\n        }\n      },\n      {\n        \"id\": 202,\n        \"name\": \"ABC Plumbing Services\",\n        \"tags\": \"emergency, residential, commercial\",\n        \"location\": \"New York, NY\",\n        \"reviews\": \"Reliable 24/7 plumbing services\",\n        \"rating\": 4.6,\n        \"profile_url\": \"https://example.com/members/202\",\n        \"thumbnail_url\": \"https://picsum.photos/seed/202/200\",\n        \"latitude\": 40.71,\n        \"longitude\": -74.01,\n        \"plan_level\": \"standard\",\n        \"priority_score\": 1\n      }\n    ]\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/suggest",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"suggest"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response has suggestions\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.suggestions).to.be.an('array');",
+							"    pm.expect(jsonData.suggestions.length).to.be.greaterThan(0);",
+							"    pm.expect(jsonData.cards).to.be.an('array');",
+							"});",
+							"pm.test(\"Original query matches\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.original_query).to.eql(\"doctor near me\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Suggestions (Minimal Data)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"current_query\": \"plumber\",\n  \"user_id\": \"{{user_id}}\",\n  \"site_data\": {}\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/suggest",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"suggest"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Response structure is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('original_query');",
+							"    pm.expect(jsonData).to.have.property('suggestions');",
+							"    pm.expect(jsonData).to.have.property('user_id');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Submit Feedback",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"query\": \"doctor near me\",\n  \"selected_suggestion\": \"Top-rated Healthcare near you\",\n  \"success_rating\": 5,\n  \"location\": \"{{user_location}}\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/feedback",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"feedback"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Feedback received\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"feedback_received\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Add Manual Data - Category",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"category\",\n  \"content\": {\n    \"name\": \"Emergency Services\",\n    \"description\": \"24/7 emergency services\",\n    \"subcategories\": [\"Medical\", \"Fire\", \"Police\"]\n  },\n  \"added_by\": \"test_admin\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Data added successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"data_added\");",
+							"    pm.expect(jsonData.type).to.eql(\"category\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Add Manual Data - Member",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"member\",\n  \"content\": {\n    \"name\": \"Dr. Jane Doe\",\n    \"location\": \"Los Angeles, CA\",\n    \"rating\": 4.9,\n    \"specialty\": \"Cardiology\",\n    \"phone\": \"+1-555-0123\",\n    \"email\": \"jane.doe@example.com\"\n  },\n  \"added_by\": \"test_admin\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Member data added\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"data_added\");",
+							"    pm.expect(jsonData.type).to.eql(\"member\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Add Manual Data - Profession",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"profession\",\n  \"content\": {\n    \"name\": \"Software Engineer\",\n    \"description\": \"Full-stack development services\",\n    \"skills\": [\"Python\", \"JavaScript\", \"React\", \"Node.js\"],\n    \"experience_level\": \"Senior\"\n  },\n  \"added_by\": \"test_admin\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Profession data added\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"data_added\");",
+							"    pm.expect(jsonData.type).to.eql(\"profession\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Add Manual Data - Location",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"location\",\n  \"content\": {\n    \"name\": \"Silicon Valley\",\n    \"state\": \"California\",\n    \"country\": \"USA\",\n    \"coordinates\": {\n      \"lat\": 37.3875,\n      \"lon\": -122.0575\n    }\n  },\n  \"added_by\": \"test_admin\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Location data added\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql(\"data_added\");",
+							"    pm.expect(jsonData.type).to.eql(\"location\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Get All Manual Data",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Data retrieved successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"    pm.expect(jsonData).to.have.property('count');",
+							"    pm.expect(jsonData.data).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Manual Data by Type",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/data?type=member",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "member"
+						}
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Only member data returned\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    if (jsonData.data.length > 0) {",
+							"        jsonData.data.forEach(item => {",
+							"            pm.expect(item.type).to.eql(\"member\");",
+							"        });",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Get Analytics",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-Key",
+						"value": "{{api_key}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/analytics?start=2024-01-01&end=2030-01-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"analytics"
+					],
+					"query": [
+						{ "key": "start", "value": "2024-01-01" },
+						{ "key": "end", "value": "2030-01-01" }
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Analytics structure is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('statistics');",
+							"    pm.expect(jsonData).to.have.property('top_queries');",
+							"    pm.expect(jsonData).to.have.property('top_suggestions');",
+							"    pm.expect(jsonData).to.have.property('learning_patterns');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Track Event",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" },
+					{ "key": "X-API-Key", "value": "{{api_key}}" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"event_type\": \"member_click\",\n  \"payload\": { \"member_id\": 101, \"profile_url\": \"https://example.com/members/101\" }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/event",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"event"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Batch Import",
+			"request": {
+				"method": "POST",
+				"header": [
+					{ "key": "Content-Type", "value": "application/json" },
+					{ "key": "X-API-Key", "value": "{{api_key}}" }
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"added_by\": \"postman\",\n  \"items\": [\n    { \"type\": \"member\", \"content\": { \"name\": \"Midtown Plumbing\", \"location\": \"New York, NY\", \"rating\": 4.7 } },\n    { \"type\": \"category\", \"content\": { \"name\": \"Legal Services\" } }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/batch_import",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batch_import"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Error Test - Missing Query",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"site_data\": {}\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/suggest",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"suggest"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"pm.test(\"Error message is correct\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.include(\"current_query is required\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		},
+		{
+			"name": "Error Test - Invalid Data Type",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"type\": \"invalid_type\",\n  \"content\": {\n    \"name\": \"Test\"\n  }\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/data",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"data"
+					]
+				}
+			},
+			"response": [],
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"pm.test(\"Error message mentions valid types\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.error).to.include(\"type must be one of\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:5000"
+		},
+		{
+			"key": "user_id",
+			"value": "test_user_123"
+		},
+		{
+			"key": "user_location",
+			"value": "New York, NY"
+		},
+		{
+			"key": "user_lat",
+			"value": "40.7128"
+		},
+		{
+			"key": "user_lon",
+			"value": "-74.0060"
+		},
+		{
+			"key": "api_key",
+			"value": "demo-key"
+		}
+	]
+}
