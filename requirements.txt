@@ -8,3 +8,6 @@ spacy
 rank-bm25
 requests
 gunicorn
+
+# Force CPU-only Torch (no CUDA libs)
+torch==2.2.2+cpu --extra-index-url https://download.pytorch.org/whl/cpu
